@@ -1,6 +1,7 @@
 import ch.hslu.ai.connect4.Game;
 import ch.hslu.ai.connect4.GameBoard;
 import ch.hslu.ai.connect4.Player;
+import main.IntelligentPlayer;
 
 /**
  * Main class with connect-4 single game and tournament mode.
@@ -24,7 +25,7 @@ public class Connect4 {
 	public static void main(String[] args) {
 		
 		// Create players:
-		Player player1 = new RandomPlayer("Captain Awesome", 'x');
+		Player player1 = new IntelligentPlayer("Captain Awesome", 'x');
 		Player player2 = new RandomPlayer("Chuck Norris", 'o');
 		
 		// Start a single game with GUI:

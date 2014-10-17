@@ -46,17 +46,23 @@ public class IntelligentPlayer extends Player {
             return ((board.length - 1) / 2);
         }
 
-        List<char[][]> boards = GetPossibleMoves(cloneBoard(board), SEARCH_DEPTH, getSymbol());
-        /*for (Tuple<Integer, List<char[][]>> tuple : boards) {
-         for (resBoard )
-         hasHowManyInColumn(board, EMPTY)
-         }*/
-
+        List<BoardState> boards = GetPossibleMovesFirst(cloneBoard(board), getSymbol());
+        int maxColumn = 0;
+        int maxVal = 0;
+        for (BoardState bs : boards) {
+            int val = hasHowManyInColumn(board, getSymbol());
+            if (val > maxVal) {
+                maxColumn = bs.Column;
+                maxVal = val;
+            }
+        }
+        return maxColumn;
+/*
         do {
             column = (int) (Math.random() * board.length);
         } while (board[column][0] != '-');
 
-        return column;
+        return column;*/
     }
 
     public boolean checkIfFirstMove(char[][] board) {
@@ -109,15 +115,39 @@ public class IntelligentPlayer extends Player {
         return maxFound;
     }
 
+    public List<BoardState> GetPossibleMovesFirst(char[][] board, char symbol) {
+        List<BoardState> possibleBoards = new ArrayList<>();
+
+        for (int i = 0; i < board.length; i++) {
+            char[] column = board[i];
+            for (int r = column.length - 1; r >= 0; r--) {
+                if (column[r] == EMPTY) {
+                    column[r] = symbol;
+
+                    BoardState bs = new BoardState();
+                    bs.Column = i;
+                    bs.Boards.addAll(this.GetPossibleMoves(cloneBoard(board), SEARCH_DEPTH, getOtherSymbol(board, symbol)));
+                    break;
+                }
+            }
+        }
+        return possibleBoards;
+    }
+
     private List<char[][]> GetPossibleMoves(char[][] board, int depth, char symbol) {
-        List<char[][]> possibleBoards = new ArrayList<char[][]>();
+        List<char[][]> possibleBoards = new ArrayList<>();
 
         if (depth != 0) {
-            for (char[] column : board) {
+            for (int i = 0; i < board.length; i++) {
+                char[] column = board[i];
                 for (int r = column.length - 1; r >= 0; r--) {
                     if (column[r] == EMPTY) {
                         column[r] = symbol;
-                        possibleBoards.addAll(this.GetPossibleMoves(cloneBoard(board), depth - 1, getOtherSymbol(board, symbol)));
+
+                        List<char[][]> res = this.GetPossibleMoves(cloneBoard(board), depth - 1, getOtherSymbol(board, symbol));
+                        if (depth - 1 == 0) {
+                            possibleBoards.addAll(res);
+                        }
                         break;
                     }
 

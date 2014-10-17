@@ -6,6 +6,8 @@
 package main;
 
 import ch.hslu.ai.connect4.Player;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -14,9 +16,8 @@ import ch.hslu.ai.connect4.Player;
 public class IntelligentPlayer extends Player {
 
     private boolean firstMoveover;
-    int columns;
-    int rows;
-    private static final char EMTPY = '-';
+    private static final int SEARCH_DEPTH = 3;
+    private static final char EMPTY = '-';
 
     public IntelligentPlayer(String name, char symbol) {
         super(name, symbol);
@@ -32,7 +33,7 @@ public class IntelligentPlayer extends Player {
                 if (board[i][j] == playerSymbol) {
                     if (counter == 0) {
                         for (int k = j - 1; k >= 0; k--) {
-                            if (board[i][k] == EMTPY || board[i][k] == playerSymbol) {
+                            if (board[i][k] == EMPTY || board[i][k] == playerSymbol) {
                                 counterPossibles++;
                             } else {
                                 break;
@@ -44,7 +45,7 @@ public class IntelligentPlayer extends Player {
                 } else {
                     if (counter != 0) {
                         for (int k = j + 1; k < board[0].length; k++) {
-                            if (board[i][k] == EMTPY || board[i][k] == playerSymbol) {
+                            if (board[i][k] == EMPTY || board[i][k] == playerSymbol) {
                                 counterPossibles++;
                             } else {
                                 break;
@@ -64,67 +65,6 @@ public class IntelligentPlayer extends Player {
         return maxFound;
     }
 
-    /**
-     * @return true if the current player has 4 consecutive discs in one row,
-     * false otherwise
-     */
-    /*private int hasHowManyInRow(char[][] board, char playerSymbol) {
-     int maxFound = 0;
-     for (int i = 0; i < board[0].length; i++) {
-     int counter = 0;
-     for (int j = 0; j < board.length && counter < 4; j++) {
-     if (board[j][i] == playerSymbol) {
-     counter++;
-     } else {
-     counter = 0;
-     }
-     }
-     if (maxFound < counter) {
-     maxFound = counter;
-     }
-     }
-     return maxFound;
-     }
-     */
-    /**
-     * @return true if the current player has 4 consecutive discs in one
-     * diagonal, false otherwise
-     */
-    /* private boolean hasHowManyInDiagonal(char[][] board, char playerSymbol) {
-
-     // Left-to-right diagonal:
-     for (int i = 0; i <= board.length - 4; i++) {
-     for (int j = 0; j <= board[0].length - 4; j++) {
-     char[] cells = new char[]{board[i][j], board[i + 1][j + 1],
-     board[i + 2][j + 2], board[i + 3][j + 3]};
-     if (equal(cells, playerSymbol)) {
-     return true;
-     }
-     }
-     }
-
-     // Right-to-left diagonal:
-     for (int i = board.length - 1; i >= 3; i--) {
-     for (int j = 0; j <= board[0].length - 4; j++) {
-     char[] cells = new char[]{board[i][j], board[i - 1][j + 1],
-     board[i - 2][j + 2], board[i - 3][j + 3]};
-     if (equal(cells, playerSymbol)) {
-     return true;
-     }
-     }
-     }
-
-     return false;
-     }
-
-     private boolean equal(char[] array, char symbol) {
-     for (int i = 0; i < array.length; i++) {
-     if (array[i] != symbol) {
-     return false;
-     }
-     }
-     return true;
-     }*/
     /**
      * The following method allows you to implement your own game intelligence.
      * The method must return the column number where the computer player puts
@@ -146,6 +86,8 @@ public class IntelligentPlayer extends Player {
             return ((board.length - 1) / 2);
         }
 
+        List<char[][]> boards = GetPossibleMoves(board, SEARCH_DEPTH, getSymbol());
+
         do {
             column = (int) (Math.random() * board.length);
         } while (board[column][0] != '-');
@@ -155,11 +97,49 @@ public class IntelligentPlayer extends Player {
 
     public boolean checkIfFirstMove(char[][] board) {
         for (int i = 0; i < board.length - 1; i++) {
-            if (board[i][board[0].length - 1] != '-') {
+            if (board[i][board[0].length - 1] != EMPTY) {
                 return false;
             }
         }
         return true;
+    }
+
+    private List<char[][]> GetPossibleMoves(char[][] board, int depth, char symbol) {
+        ArrayList<char[][]> possibleBoards = new ArrayList<char[][]>();
+
+        if (depth != 0) {
+            for (char[] column : board) {
+                for (int r = column.length - 1; r >= 0; r++) {
+                    if (column[r] == EMPTY) {
+                        column[r] = symbol;
+                    }
+                    possibleBoards.addAll(this.GetPossibleMoves(cloneBoard(board), depth - 1, getOtherSymbol(board, symbol)));
+                }
+            }
+        }
+
+        return possibleBoards;
+    }
+
+    private char[][] cloneBoard(char[][] board) {
+        char[][] newBoard = board.clone();
+        for (int i = 0; i < board.length; i++) {
+            newBoard[i] = board[i].clone();
+        }
+        return newBoard;
+    }
+
+    private char getOtherSymbol(char[][] board, char firstSymbol) {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (board[i][j] != firstSymbol
+                        && board[i][j] != EMPTY) {
+                    return board[i][j];
+                }
+            }
+        }
+        // Fallback
+        return firstSymbol == 'x' ? 'o' : 'x';
     }
 
 }

@@ -6,12 +6,17 @@
 package main;
 
 import ch.hslu.ai.connect4.Player;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Alessandro
  */
 public class IntelligentPlayer extends Player {
+
+    private final int SEARCH_DEPTH = 3;
+    private final char EMPTY = '-';
 
     private boolean firstMoveover;
 
@@ -41,6 +46,8 @@ public class IntelligentPlayer extends Player {
             return ((board.length - 1) / 2);
         }
 
+        List<char[][]> boards = GetPossibleMoves(board, SEARCH_DEPTH);
+
         do {
             column = (int) (Math.random() * board.length);
         } while (board[column][0] != '-');
@@ -48,13 +55,34 @@ public class IntelligentPlayer extends Player {
         return column;
     }
 
-    public boolean checkIfFirstMove(char[][] board) {
+    private boolean checkIfFirstMove(char[][] board) {
+        boolean isEmpty = true;
         for (int i = 0; i < board.length - 1; i++) {
-            if (board[i][board[0].length - 1] != '-') {
-                return false;
+
+            if (board[i][board[0].length - 1] != EMPTY) {
+                isEmpty = false;
+                return isEmpty;
             }
         }
-        return true;
+        return isEmpty;
+    }
+
+    private List<char[][]> GetPossibleMoves(char[][] board, int depth) {
+        ArrayList<char[][]> possibleBoards = new ArrayList<>();
+
+        if (depth != 0) {
+            for (char[] column : board) {
+                for (int r = column.length - 1; r >= 0; r++) {
+                    if (column[r] == EMPTY) {
+                        column[r] = this.getSymbol();
+                    }
+
+                    possibleBoards.addAll(this.GetPossibleMoves(board, depth - 1));
+                }
+            }
+        }
+
+        return possibleBoards;
     }
 
 }

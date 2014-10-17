@@ -29,7 +29,7 @@ public class Connect4 {
 		Player player2 = new RandomPlayer("Chuck Norris", 'o');
 		
 		// Start a single game with GUI:
-		singleGameMode(player1, player2);
+		singleGameMode(player2, player1);
 		
 		// Start a tournament with many rounds:
 		//tournamentMode(player1, player2, 100);

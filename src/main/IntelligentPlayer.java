@@ -25,8 +25,6 @@ public class IntelligentPlayer extends Player {
         firstMoveover = false;
     }
 
-    
-
     /**
      * The following method allows you to implement your own game intelligence.
      * The method must return the column number where the computer player puts
@@ -48,7 +46,11 @@ public class IntelligentPlayer extends Player {
             return ((board.length - 1) / 2);
         }
 
-        List<char[][]> boards = GetPossibleMoves(board, SEARCH_DEPTH, getSymbol());
+        List<char[][]> boards = GetPossibleMoves(cloneBoard(board), SEARCH_DEPTH, getSymbol());
+        /*for (Tuple<Integer, List<char[][]>> tuple : boards) {
+         for (resBoard )
+         hasHowManyInColumn(board, EMPTY)
+         }*/
 
         do {
             column = (int) (Math.random() * board.length);
@@ -65,7 +67,7 @@ public class IntelligentPlayer extends Player {
         }
         return true;
     }
-    
+
     private int hasHowManyInColumn(char[][] board, char playerSymbol) {
         int maxFound = 0;
         for (int i = 0; i < board.length; i++) {
@@ -108,15 +110,17 @@ public class IntelligentPlayer extends Player {
     }
 
     private List<char[][]> GetPossibleMoves(char[][] board, int depth, char symbol) {
-        ArrayList<char[][]> possibleBoards = new ArrayList<char[][]>();
+        List<char[][]> possibleBoards = new ArrayList<char[][]>();
 
         if (depth != 0) {
             for (char[] column : board) {
-                for (int r = column.length - 1; r >= 0; r++) {
+                for (int r = column.length - 1; r >= 0; r--) {
                     if (column[r] == EMPTY) {
                         column[r] = symbol;
+                        possibleBoards.addAll(this.GetPossibleMoves(cloneBoard(board), depth - 1, getOtherSymbol(board, symbol)));
+                        break;
                     }
-                    possibleBoards.addAll(this.GetPossibleMoves(cloneBoard(board), depth - 1, getOtherSymbol(board, symbol)));
+
                 }
             }
         }
@@ -133,11 +137,11 @@ public class IntelligentPlayer extends Player {
     }
 
     private char getOtherSymbol(char[][] board, char firstSymbol) {
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[0].length; j++) {
-                if (board[i][j] != firstSymbol
-                        && board[i][j] != EMPTY) {
-                    return board[i][j];
+        for (char[] column : board) {
+            for (int r = column.length - 1; r >= 0; r--) {
+                if (column[r] != firstSymbol
+                        && column[r] != EMPTY) {
+                    return column[r];
                 }
             }
         }
@@ -146,4 +150,3 @@ public class IntelligentPlayer extends Player {
     }
 
 }
-

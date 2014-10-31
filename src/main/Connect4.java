@@ -24,7 +24,7 @@ public class Connect4 {
 
         // Create players:
         Player player1 = new IntelligentPlayer("Captain Awesome", 'x');
-        Player player2 = new RandomPlayer("Chuck Norris", 'o');
+        Player player2 = new IntelligentPlayer("Chuck Norris", 'o');
 
         // Start a single game with GUI:
         //singleGameMode(player2, player1);

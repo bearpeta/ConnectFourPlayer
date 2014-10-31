@@ -17,9 +17,8 @@ import java.util.List;
 public class IntelligentPlayer extends Player {
 
     private boolean firstMoveover;
-    private static final int SEARCH_DEPTH = 3;
+    private static final int SEARCH_DEPTH = 2;
     private static final char EMPTY = '-';
-    private char otherPlayer = '-';
 
     public IntelligentPlayer(String name, char symbol) {
         super(name, symbol);
@@ -57,7 +56,7 @@ public class IntelligentPlayer extends Player {
                     sumOfAll -= 15;
                 }
                 if (hasWon(subBoard, getSymbol())) {
-                    sumOfAll += 50;
+                    sumOfAll += 20;
                 }
                 sumOfAll += hasHowManyInColumn(subBoard, getSymbol());
                 sumOfAll -= hasHowManyInColumn(subBoard, getOtherSymbol(board, getSymbol()));
@@ -245,21 +244,18 @@ public class IntelligentPlayer extends Player {
     }
 
     private char getOtherSymbol(char[][] board, char firstSymbol) {
-        if (otherPlayer == '-') {
-            for (char[] column : board) {
-                for (int r = column.length - 1; r >= 0; r--) {
-                    if (column[r] != firstSymbol
-                            && column[r] != EMPTY) {
-                        otherPlayer = column[r];
-                        return otherPlayer;
-                    }
+
+        for (char[] column : board) {
+            for (int r = column.length - 1; r >= 0; r--) {
+                if (column[r] != firstSymbol
+                        && column[r] != EMPTY) {
+                    return column[r];
                 }
             }
-            // Fallback
-            return firstSymbol == 'x' ? 'o' : 'x';
-        } else {
-            return otherPlayer == firstSymbol ? getSymbol() : otherPlayer;
         }
+        // Fallback
+        return firstSymbol == 'x' ? 'o' : 'x';
+
     }
 
     private boolean equal(char[] array, char symbol) {
